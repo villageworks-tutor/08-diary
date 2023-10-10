@@ -48,8 +48,7 @@ public class LoginServlet extends HttpServlet {
 				
 				if (profile == null) {
 					// ユーザ情報が取得できなかった場合：ログイン失敗
-					request.setAttribute("message", "メールアドレスまたはパスワードが間違っています。");
-					this.gotoPage(request, response, "error.jsp");
+					this.gotoErrPage(request, response, "メールアドレスまたはパスワードが間違っています。");
 					return;
 				}
 				
@@ -68,8 +67,7 @@ public class LoginServlet extends HttpServlet {
 				
 			} catch (DAOException e) {
 				e.printStackTrace();
-				request.setAttribute("message", "内部エラーが発生しました。");
-				gotoPage(request, response, "error.jsp");
+				this.gotoErrPage(request, response);
 			}
 		} else if (action.equals("create")) {
 			// 新規投稿の場合
@@ -94,8 +92,7 @@ public class LoginServlet extends HttpServlet {
 				this.gotoPage(request, response, "success.jsp");
 			} catch (DAOException e) {
 				e.printStackTrace();
-				request.setAttribute("message", "内部エラーが発生しました。");
-				gotoPage(request, response, "error.jsp");
+				this.gotoErrPage(request, response);
 			}
 		} else if (action.equals("edit")) {
 			// 編集の場合
@@ -113,8 +110,7 @@ public class LoginServlet extends HttpServlet {
 				
 			} catch (DAOException e) {
 				e.printStackTrace();
-				request.setAttribute("message", "内部エラーが発生しました。");
-				gotoPage(request, response, "error.jsp");
+				this.gotoErrPage(request, response);
 			}
 		} else if (action.equals("update")) {
 			// 更新処理の場合
@@ -139,8 +135,7 @@ public class LoginServlet extends HttpServlet {
 				this.gotoPage(request, response, "success.jsp");
 			} catch (DAOException e) {
 				e.printStackTrace();
-				request.setAttribute("message", "内部エラーが発生しました。");
-				gotoPage(request, response, "error.jsp");
+				this.gotoErrPage(request, response);
 			}
 		} else if (action.equals("showOne")) {
 			// 記事単一表示の場合
@@ -158,8 +153,7 @@ public class LoginServlet extends HttpServlet {
 				
 			} catch (DAOException e) {
 				e.printStackTrace();
-				request.setAttribute("message", "内部エラーが発生しました。");
-				gotoPage(request, response, "error.jsp");
+				this.gotoErrPage(request, response);
 			}
 		} else if (action.equals("delete")) {
 			// 削除の場合
@@ -180,8 +174,7 @@ public class LoginServlet extends HttpServlet {
 				
 			} catch (DAOException e) {
 				e.printStackTrace();
-				request.setAttribute("message", "内部エラーが発生しました。");
-				gotoPage(request, response, "error.jsp");
+				this.gotoErrPage(request, response);
 			}
 			
 		} else if (action.equals("logout")) {
@@ -195,11 +188,34 @@ public class LoginServlet extends HttpServlet {
 			this.gotoPage(request, response, "login.jsp");
 		} else {
 			// 定義外の値がactinキーに設定された場合
-			request.setAttribute("message", "内部エラーが発生しました。");
-			gotoPage(request, response, "error.jsp");
+			this.gotoErrPage(request, response);
 		}
 	}
 	
+	/**
+	 * 固定メーッセージをエラーページに表示する
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void gotoErrPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		this.gotoErrPage(request, response, "内部エラーが発生しました。");
+	}
+
+	/**
+	 * メッセージをエラーページに表示する
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @param message  表示するメッセージ
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void gotoErrPage(HttpServletRequest request, HttpServletResponse response, String message) throws ServletException, IOException {
+		request.setAttribute("message", message);
+		this.gotoPage(request, response, "error.jsp");
+	}
+
 	/**
 	 * 指定したパスに遷移する
 	 * @param request  HttpServletRequest
