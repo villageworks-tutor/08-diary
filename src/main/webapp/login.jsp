@@ -7,7 +7,7 @@
 	<title>日記システム</title>
 </head>
 <body>
-	<form action="/diary/LoginServlet" method="post">
+	<form action="/diary/AuthServlet" method="post">
 		email：<input type="text" name="email"><br>
 		パスワード：<input type="password" name="password"><br>
 		<input type="hidden" name="action" value="login">

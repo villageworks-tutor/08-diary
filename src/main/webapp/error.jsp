@@ -9,6 +9,6 @@
 <body>
 	<h2>${message}</h2>
 	<br>
-	<a href="LoginServlet?action=top">ログイン画面へ</a>
+	<a href="AuthServlet?action=top">ログイン画面へ</a>
 </body>
 </html>

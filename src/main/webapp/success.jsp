@@ -19,11 +19,11 @@
 		<c:forEach items="${requestScope.articleList}" var="article">
 			<tr>
 				<td>
-					<a href="/diary/LoginServlet?action=showOne&id=${article.id}">${article.id}</a>
+					<a href="/diary/ArticleServlet?action=detail&id=${article.id}">${article.id}</a>
 			    </td>
 			    <td>${article.title}</td>
 			    <td>
-				    <form action="/diary/LoginServlet" method="post">
+				    <form action="/diary/ArticleServlet" method="post">
 				    	<input type="submit" value="削除">
 				    	<input type="hidden" name="action" value="delete">
 				    	<input type="hidden" name="id" value="${article.id}">
@@ -31,7 +31,7 @@
 				    </form>
 			    </td>
 			    <td>
-				    <form action="/diary/LoginServlet" method="post">
+				    <form action="/diary/ArticleServlet" method="post">
 				    	<input type="submit" value="編集">
 				    	<input type="hidden" name="action" value="edit">
 				    	<input type="hidden" name="id" value="${article.id}">
@@ -41,14 +41,14 @@
 		</c:forEach>
 	</table>
 	<hr>
-	<form action="/diary/LoginServlet" method="post">
+	<form action="/diary/ArticleServlet" method="post">
 		タイトル：<input type="text" name="title"><br>
 		内容：<input type="text" name="content" size="50"><br>
-		<input type="hidden" name="action" value="create">
+		<input type="hidden" name="action" value="post">
 		<input type="hidden" name="userId" value="${sessionScope.profile.id}">
 		<input type="submit" value="記事投稿">
 	</form>
 	<hr>
-	<a href="/diary/LoginServlet?action=logout">ログアウト</a>
+	<a href="/diary/AuthServlet?action=logout">ログアウト</a>
 </body>
 </html>
