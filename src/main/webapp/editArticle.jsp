@@ -7,7 +7,7 @@
 	<title>日記システム</title>
 </head>
 <body>
-	<form action="/diary/LoginServlet" method="post">
+	<form action="/diary/ArticleServlet" method="post">
 		タイトル：<input type="text" name="title" value="${article.title}"><br>
 		内容：<input type="text" name="content" size="50" value="${article.content}"><br>
 		<input type="hidden" name="id" value="${article.id}">
