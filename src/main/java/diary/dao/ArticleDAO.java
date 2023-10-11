@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import diary.bean.ArticleBean;
+import diary.bean.SearchBean;
 
 /**
  * 記事に関するデータにアクセスするDAO
@@ -95,6 +96,45 @@ public class ArticleDAO extends BaseDAO {
 	}
 
 	/**
+	 * 指定されたキーワードがタイトルまたは記事内容に含まれている記事を取得する
+	 * @param condition 検索条件
+	 * @return 記事リスト
+	 * @throws DAOException
+	 */
+	public List<ArticleBean> findByKewordOrPeriod(SearchBean condition) throws DAOException {
+		// 実行するSQLの設定
+		String sql = "SELECT * FROM article WHERE (title LIKE ? OR content LIKE ?) AND user_id = ? ORDER BY created_at DESC";
+		try (//
+			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
+			// プレースホルダにパラメータをバインド
+			pstmt.setString(1, "%" + condition.getKeyword() + "%");
+			pstmt.setString(2, "%" + condition.getKeyword() + "%");
+			pstmt.setInt(3, condition.getUserId());
+			try (// SQLの実行と結果セットの取得
+				 ResultSet rs = pstmt.executeQuery();) {
+				// 結果セットを記事リストに変換
+				List<ArticleBean> list = new ArrayList<ArticleBean>();
+				ArticleBean bean = null;
+				while (rs.next()) {
+					bean = new ArticleBean();
+					bean.setId(rs.getInt("article_id"));
+					bean.setTitle(rs.getString("title"));
+					bean.setContent(rs.getString("content"));
+					bean.setCreatedAt(rs.getTimestamp("created_at"));
+					bean.setUserId(rs.getInt("user_id"));
+					list.add(bean);
+				}
+				// 記事リストを返却
+				return list;
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+	}
+
+	/**
 	 * 新規記事を投稿する
 	 * @param article 新規記事
 	 * @throws DAOException
@@ -110,6 +150,7 @@ public class ArticleDAO extends BaseDAO {
 			pstmt.setInt(3, article.getUserId());
 			// SQLの実行
 			pstmt.executeUpdate();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DAOException("レコードの追加に失敗しました。");

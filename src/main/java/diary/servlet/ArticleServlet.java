@@ -8,8 +8,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import diary.bean.ArticleBean;
+import diary.bean.ProfileBean;
+import diary.bean.SearchBean;
 import diary.common.ConvertUtils;
 import diary.dao.ArticleDAO;
 import diary.dao.DAOException;
@@ -100,12 +103,47 @@ public class ArticleServlet extends BaseServlet {
 				request.setAttribute("articleList", list);
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");
-				
+
 			} catch (DAOException e) {
 				e.printStackTrace();
 				this.gotoErrPage(request, response);
 			}
 			
+		} else if (action.equals("search")) {
+			// 検索の場合
+			String keyword = request.getParameter("keyword");
+			
+			// セッションからユーザ情報を取得
+			HttpSession session = request.getSession(false);
+			if (session == null) {
+				this.gotoErrPage(request, response, "セッションがタイムアウトしています。トップページから操作してください。");
+				return;
+			}
+			ProfileBean bean = (ProfileBean) session.getAttribute("profile");
+			if (bean == null)  {
+				this.gotoErrPage(request, response, "不正な操作です。");
+			}
+			
+			// 検索条件のインスタンス化
+			SearchBean condition = new SearchBean(keyword, bean.getId());
+			
+			try {
+				// 検索の実行
+				ArticleDAO dao = new ArticleDAO();
+				List<ArticleBean> list = dao.findByKewordOrPeriod(condition);
+				
+				// リクエストに検索条件と記事リストを登録
+				request.setAttribute("condition", condition);
+				request.setAttribute("articleList", list);
+				// 画面遷移
+				this.gotoPage(request, response, "success.jsp");
+				
+				
+			} catch (DAOException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+				this.gotoErrPage(request, response);
+			}
 		}
 	}
 
