@@ -10,10 +10,26 @@
 <body>
 	${sessionScope.profile.name}さんの日記
 	<hr>
+	<form action="ArticleServlet" method="post">
+	<table border="0">
+		<tr>
+			<td>キーワード</td>
+			<td>
+				<input type="text" name="keyword" value="${requestScope.condition.keyword}">
+				<input type="hidden" name="userId" value="${sessionScope.profile.id}">
+				<button type="submit" name="action" value="search">検索</button>
+			</td>
+		</tr>
+	</table>
+	</form>
+	<hr>
 	<table border="1">
 		<tr>
 			<th>記事番号</th>
 			<th>タイトル</th>
+		    <c:if test="${!empty requestScope.condition}">
+		    <th>内容</th>
+		    </c:if>
 			<th colspan="2">操作</th>
 		</tr>
 		<c:forEach items="${requestScope.articleList}" var="article">
@@ -22,6 +38,9 @@
 					<a href="/diary/ArticleServlet?action=detail&id=${article.id}">${article.id}</a>
 			    </td>
 			    <td>${article.title}</td>
+			    <c:if test="${!empty requestScope.condition}">
+			    <td>${article.content}</td>
+			    </c:if>
 			    <td>
 				    <form action="/diary/ArticleServlet" method="post">
 				    	<input type="submit" value="削除">
