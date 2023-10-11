@@ -123,19 +123,31 @@ public class ArticleDAO extends BaseDAO {
 	 */
 	public void update(ArticleBean article) throws DAOException {
 		// 実行するSQLを設定
-		String sql = "UPDATE article SET title = ?, content = ?, created_at = CURRENT_TIMESTAMP WHERE article_id = ?";
+		String sql = "";
+		String mode = "";
+		if (article.getId() == 0) {
+			sql = "INSERT INTO article (title, content, created_at, user_id) VALUES (?, ?, CURRENT_TIMESTAMP, ?)";
+			mode = "追加";
+		} else {
+			sql = "UPDATE article SET title = ?, content = ?, created_at = CURRENT_TIMESTAMP WHERE article_id = ?";
+			mode = "更新";
+		}
 		try (// SQL実行オブジェクトを取得
 			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
 			// プレースホルダにパラメータをバインド
 			pstmt.setString(1, article.getTitle());
 			pstmt.setString(2, article.getContent());
-			pstmt.setInt(3, article.getId());
+			if (article.getId() == 0) {
+				pstmt.setInt(3, article.getUserId());
+			} else {
+				pstmt.setInt(3, article.getId());
+			}
 			// SQLの実行
 			pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new DAOException("レコードの更新に失敗しました。");
+			throw new DAOException("レコードの" + mode + "に失敗しました。");
 		}
 	}
 
