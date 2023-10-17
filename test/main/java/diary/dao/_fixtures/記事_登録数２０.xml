@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- articleテーブルのサンプル登録用レコード -->
+<dataset>
+	<article article_id="1" title="研修開始1" content="これから技術を習得してエンジニアを目指します！" created_at="2022-04-01" user_id="1" />
+	<article article_id="2" title="IT 基礎1" content="インターネットの仕組みとデータの流れを勉強しました" created_at="2022-04-02" user_id="1" />
+	<article article_id="3" title="プログラミング1" content="条件分岐や繰り返し処理によって幅が広がってきました" created_at="2022-04-12" user_id="1" />
+	<article article_id="4" title="ペットの紹介1" content="猫を 2 匹飼っています" created_at="2022-04-01" user_id="2" />
+	<article article_id="5" title="今日の天気1" content="突然のにわか雨でした" created_at="2022-04-02" user_id="2" />
+	<article article_id="6" title="研修開始2" content="これから技術を習得してエンジニアを目指します！" created_at="2022-05-01" user_id="1" />
+	<article article_id="7" title="IT 基礎2" content="インターネットの仕組みとデータの流れを勉強しました" created_at="2022-05-02" user_id="1" />
+	<article article_id="8" title="プログラミング2" content="条件分岐や繰り返し処理によって幅が広がってきました" created_at="2022-05-12" user_id="1" />
+	<article article_id="9" title="ペットの紹介2" content="猫を 2 匹飼っています" created_at="2022-05-01" user_id="2" />
+	<article article_id="10" title="今日の天気2" content="突然のにわか雨でした" created_at="2022-05-02" user_id="2" />
+	<article article_id="11" title="研修開始3" content="これから技術を習得してエンジニアを目指します！" created_at="2022-06-01" user_id="1" />
+	<article article_id="12" title="IT 基礎3" content="インターネットの仕組みとデータの流れを勉強しました" created_at="2022-06-02" user_id="1" />
+	<article article_id="13" title="プログラミング3" content="条件分岐や繰り返し処理によって幅が広がってきました" created_at="2022-06-12" user_id="1" />
+	<article article_id="14" title="ペットの紹介3" content="猫を 2 匹飼っています" created_at="2022-06-01" user_id="2" />
+	<article article_id="15" title="今日の天気3" content="突然のにわか雨でした" created_at="2022-06-02" user_id="2" />
+	<article article_id="16" title="研修開始4" content="これから技術を習得してエンジニアを目指します！" created_at="2022-07-01" user_id="1" />
+	<article article_id="17" title="IT 基礎4" content="インターネットの仕組みとデータの流れを勉強しました" created_at="2022-07-02" user_id="1" />
+	<article article_id="18" title="プログラミング4" content="条件分岐や繰り返し処理によって幅が広がってきました" created_at="2022-07-12" user_id="1" />
+	<article article_id="19" title="ペットの紹介4" content="猫を 2 匹飼っています" created_at="2022-07-01" user_id="2" />
+	<article article_id="20" title="今日の天気4" content="突然のにわか雨でした" created_at="2022-07-02" user_id="2" />
+</dataset>

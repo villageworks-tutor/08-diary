@@ -130,7 +130,7 @@ public class ArticleServlet extends BaseServlet {
 			try {
 				// 検索の実行
 				ArticleDAO dao = new ArticleDAO();
-				List<ArticleBean> list = dao.findByKewordOrPeriod(condition);
+				List<ArticleBean> list = dao.findLikeKeywordAndUserId(condition);
 				
 				// リクエストに検索条件と記事リストを登録
 				request.setAttribute("condition", condition);
