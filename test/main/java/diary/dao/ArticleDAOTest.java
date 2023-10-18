@@ -5,15 +5,10 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.AfterAll;
@@ -32,43 +27,13 @@ import diary.dao.matcher.EqualToArticle;
 
 /**
  * ArticleDAOのテストクラス
- * テスト対象クラスとテスト補助クラスはこのクラス内でそれぞれ1つでよいのでstatcオブジェクトとして宣言する。
  */
 @TestInstance(Lifecycle.PER_CLASS)
-class ArticleDAOTest {
+class ArticleDAOTest extends BaseDaoTest {
 	
-	/**
-	 * クラス定数
-	 */
-	// データベース接続情報文字列定数群
-	private static final String JDBC_DRIVER = "org.postgresql.Driver";
-	private static final String DB_URL      = "jdbc:postgresql://localhost:5432/sample";
-	private static final String DB_USER     = "student";
-	private static final String DB_PASSWORD = "himitu";
-	// データセットパス
-	private static final String DIR_FIXTURES = "test/main/java/diary/dao/_fixtures/";
-	private static final String FIXTURES_XML_00  = DIR_FIXTURES + "記事_復元.xml";
-	private static final String FIXTURES_XML_01  = DIR_FIXTURES + "記事_登録数２０.xml";
-	
-	/** テスト対象クラス：systen under test */
-	private static ArticleDAO sut;
-	
-	/** テスト補助クラス */
-	private static Connection jdbcConnection;            // JDBCによるデータベース接続オブジェクト
-	private static IDatabaseConnection dbUnitConnection; // DbUnitによるデータベース接続オブジェクト
-	private static IDataSet dataset;                     // テスト用データセット
-	
-	@BeforeAll
-	void setUpAll() throws Exception {
-		// テスト対象クラスのインスタンス化
-		sut = new ArticleDAO();
-		// JDBCドライバの読込み
-		Class.forName(JDBC_DRIVER);
-		// JDBCによるデータベース接続オブジェクトの取得
-		jdbcConnection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-		// DbUnnitによるデータベース接続オブジェクトの取得
-		dbUnitConnection = new DatabaseConnection(jdbcConnection);
-	}
+	// データセットとして読み込むXMLファイルのパス
+	protected static final String FIXTURES_XML_00  = DIR_FIXTURES + "記事_復元.xml";
+	protected static final String FIXTURES_XML_01  = DIR_FIXTURES + "記事_登録数２０.xml";
 	
 	@Nested
 	@DisplayName("ArticleDAO検索系メソッドのテストクラス")
