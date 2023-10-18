@@ -32,7 +32,7 @@ import diary.dao.matcher.EqualToArticle;
 
 /**
  * ArticleDAOのテストクラス
- * テスト対象クラスとおテスト補助クラスはこのクラス内でひとつでよいのでstatcオブジェクトとして宣言する。
+ * テスト対象クラスとテスト補助クラスはこのクラス内でそれぞれ1つでよいのでstatcオブジェクトとして宣言する。
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class ArticleDAOTest {
