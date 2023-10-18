@@ -1,6 +1,20 @@
+<%@page import="java.sql.Timestamp"%>
+<%@page import="diary.bean.ArticleBean"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+List<ArticleBean> articleList = new ArrayList<ArticleBean>();
+articleList.add(new ArticleBean(1, "研修開始1", "これから技術を習得してエンジニアを目指します！", Timestamp.valueOf("2022-04-01 00:00:00"), 1));
+articleList.add(new ArticleBean(2, "IT 基礎1", "インターネットの仕組みとデータの流れを勉強しました", Timestamp.valueOf("2022-04-02 00:00:00"), 1));
+articleList.add(new ArticleBean(3, "プログラミング1", "条件分岐や繰り返し処理によって幅が広がってきました", Timestamp.valueOf("2022-04-12 00:00:00"), 1));
+articleList.add(new ArticleBean(6, "研修開始2", "これから技術を習得してエンジニアを目指します！", Timestamp.valueOf("2022-05-01 00:00:00"), 1));
+articleList.add(new ArticleBean(7, "IT 基礎2", "インターネットの仕組みとデータの流れを勉強しました", Timestamp.valueOf("2022-05-02 00:00:00"), 1));
+request.setAttribute("articleList", articleList);
+request.setAttribute("totalPage", 4);
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -58,7 +72,11 @@
 			    </td>
 			</tr>
 		</c:forEach>
+		<caption style="text-align: left">
+			<jsp:include page="pagination.jsp" />
+		</caption>
 	</table>
+	<jsp:include page="pagination.jsp" />
 	<hr>
 	<form action="/diary/ArticleServlet" method="post">
 		タイトル：<input type="text" name="title"><br>
