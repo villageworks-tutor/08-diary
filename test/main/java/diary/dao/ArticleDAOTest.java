@@ -51,7 +51,7 @@ class ArticleDAOTest extends BaseDaoTest {
 		@AfterAll
 		void tearDown() throws Exception {
 			// 復元用データセットの設定
-			dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(FIXTURES_XML_00));
+			dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(FIXTURES_XML_01));
 			// データの復元
 			DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataset);
 		}

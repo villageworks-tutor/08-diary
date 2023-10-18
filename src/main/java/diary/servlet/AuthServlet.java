@@ -54,13 +54,22 @@ public class AuthServlet extends BaseServlet {
 				
 				// ログインユーザが投稿したすべての記事を取得
 				ArticleDAO articleDao = new ArticleDAO();
-				List<ArticleBean> list = articleDao.findAllByUserId(profile.getId());
+				// List<ArticleBean> list = articleDao.findAllByUserId(profile.getId());
+				int limits = 5;
+				int firstPage = 1;
+				List<ArticleBean> list = articleDao.findByPaging(limits, firstPage, profile.getId());
 				
+				// ログインユーザの投稿した記事の総数を取得
+				int count = articleDao.countAllByUserId(profile.getId());
+				// 分割されたページ数を計算
+				int totalPage = count / limits + 1;
 				// セッションにユーザ情報を登録
 				HttpSession session = request.getSession();
+				
 				session.setAttribute("profile", profile);
 				// リクエストに記事リストを登録
 				request.setAttribute("articleList", list);
+				request.setAttribute("totalPage", totalPage);
 				
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");

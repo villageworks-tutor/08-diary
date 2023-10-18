@@ -166,7 +166,7 @@ public class ArticleDAO extends BaseDAO {
 			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
 			// 表示するページの先頭レコードの位置を計算
 			int offset = limits * (page - 1);
-			// プレースホルダにパラッメータをバインド
+			// プレースホルダにパラメータをバインド
 			pstmt.setInt(1, userId);
 			pstmt.setInt(2, limits);
 			pstmt.setInt(3, offset);
@@ -188,6 +188,29 @@ public class ArticleDAO extends BaseDAO {
 				return list;
 			}
 			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+	}
+
+	public int countAllByUserId(int userId) throws DAOException {
+		// 実行するSQLの設定
+		String sql = "SELECT count(*) FROM article WHERE user_id = ?";
+		try (// SQL実行オブジェクトを取得
+			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
+			// プレースホルダにパラメータをバインド
+			pstmt.setInt(1, userId);
+			try (// SQLの実行と結果セットの取得
+				 ResultSet rs = pstmt.executeQuery();) {
+				// 結果セットから件数を取得
+				int count = 0;
+				if (rs.next()) {
+					count = rs.getInt(1);
+				}
+				// 件数を返却
+				return count;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DAOException("レコードの取得に失敗しました。");
