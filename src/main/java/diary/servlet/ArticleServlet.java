@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import diary.bean.ArticleBean;
+import diary.bean.CriteriaBean;
 import diary.bean.ProfileBean;
-import diary.bean.SearchBean;
 import diary.common.ConvertUtils;
 import diary.dao.ArticleDAO;
 import diary.dao.DAOException;
@@ -122,15 +122,17 @@ public class ArticleServlet extends BaseServlet {
 			ProfileBean bean = (ProfileBean) session.getAttribute("profile");
 			if (bean == null)  {
 				this.gotoErrPage(request, response, "不正な操作です。");
+				return;
 			}
 			
 			// 検索条件のインスタンス化
-			SearchBean condition = new SearchBean(keyword, bean.getId());
+			CriteriaBean condition = new CriteriaBean(keyword, bean.getId());
 			
 			try {
 				// 検索の実行
 				ArticleDAO dao = new ArticleDAO();
 				List<ArticleBean> list = dao.findLikeKeywordAndUserId(condition);
+			
 				
 				// リクエストに検索条件と記事リストを登録
 				request.setAttribute("condition", condition);
@@ -138,11 +140,47 @@ public class ArticleServlet extends BaseServlet {
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");
 				
-				
 			} catch (DAOException e) {
-				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 				this.gotoErrPage(request, response);
+			}
+		} else if (action.equals("pagination")) {
+			// セッションからユーザ情報を取得
+			HttpSession session = request.getSession(false);
+			if (session == null) {
+				this.gotoErrPage(request, response, "セッションがタイムアウトしています。トップページから操作してください。");
+				return;
+			}
+			ProfileBean profile = (ProfileBean) session.getAttribute("profile");
+			if (profile == null) {
+				this.gotoErrPage(request, response, "不正な操作です。");
+				return;
+			}
+			// ログインユーザのユーザIDを取得
+			int userId = profile.getId();
+			
+			try {
+				// リクエストパラメータを取得
+				int page = Integer.parseInt(request.getParameter("page"));
+				int total = Integer.parseInt(request.getParameter("total"));
+				// ページ単位の投稿記事を取得
+				ArticleDAO dao = new ArticleDAO();
+				List<ArticleBean> list = dao.findByPaging(LIMIT_PER_PAGE, page, userId);
+				// リクエストスコープに登録
+				request.setAttribute("articleList", list);
+				request.setAttribute("totalPage", total);
+				
+				// 画面遷移
+				this.gotoPage(request, response, "success.jsp");
+				
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				this.gotoErrPage(request, response, "不正な操作です。");
+				return;
+			} catch (DAOException e) {
+				e.printStackTrace();
+				this.gotoErrPage(request, response);
+				return;
 			}
 		}
 	}

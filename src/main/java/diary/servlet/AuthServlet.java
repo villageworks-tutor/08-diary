@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import diary.bean.ArticleBean;
+import diary.bean.CriteriaBean;
 import diary.bean.ProfileBean;
 import diary.dao.ArticleDAO;
 import diary.dao.DAOException;
@@ -23,7 +24,7 @@ import diary.dao.ProfileDAO;
 @WebServlet("/AuthServlet")
 public class AuthServlet extends BaseServlet {
 	private static final long serialVersionUID = 1L;
-
+	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -55,14 +56,15 @@ public class AuthServlet extends BaseServlet {
 				// ログインユーザが投稿したすべての記事を取得
 				ArticleDAO articleDao = new ArticleDAO();
 				// List<ArticleBean> list = articleDao.findAllByUserId(profile.getId());
-				int limits = 5;
 				int firstPage = 1;
-				List<ArticleBean> list = articleDao.findByPaging(limits, firstPage, profile.getId());
+				// List<ArticleBean> list = articleDao.findLikeKeywordWithPagination(criteria);
+				List<ArticleBean> list = articleDao.findAllByUserId(new CriteriaBean(profile.getId(), LIMIT_PER_PAGE, firstPage));
+				
 				
 				// ログインユーザの投稿した記事の総数を取得
 				int count = articleDao.countAllByUserId(profile.getId());
 				// 分割されたページ数を計算
-				int totalPage = count / limits + 1;
+				int totalPage = count / LIMIT_PER_PAGE + 1;
 				// セッションにユーザ情報を登録
 				HttpSession session = request.getSession();
 				

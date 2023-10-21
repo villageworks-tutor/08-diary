@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/BaseServlet")
 public class BaseServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * クラス定数
+	 */
+	protected static final int LIMIT_PER_PAGE = 5; // ページあたりに表示する件数
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)

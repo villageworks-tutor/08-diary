@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import diary.bean.ArticleBean;
-import diary.bean.SearchBean;
+import diary.bean.CriteriaBean;
 
 /**
  * 記事に関するデータにアクセスするDAO
@@ -61,6 +61,77 @@ public class ArticleDAO extends BaseDAO {
 	}
 	
 	/**
+	 * ユーザIDが合致した記事を指定した検索条件で取得する
+	 * @param criteria 検索条件
+	 * @return 記事リストｓ
+	 * @throws DAOException
+	 */
+	public List<ArticleBean> findAllByUserIdWithPagination(CriteriaBean criteria) throws DAOException {
+		// 実行するSQLの設定
+		String sql = "SELECT * FROM article WHERE user_id = ? ORDER BY article_id LIMIT ? OFFSET ?";
+		try (// SQL実行オブジェクトを取得
+			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
+			// オフセット位置を設定
+			int  offset = 1;
+			// プレースホルダにパラメータをバインド
+			pstmt.setInt(1, criteria.getUserId());
+			pstmt.setInt(2, criteria.getLimits());
+			pstmt.setInt(3, offset);
+			try (// SQLの実行と結果セットの取得
+				 ResultSet rs = pstmt.executeQuery();) {
+				// 結果セットから投稿記事リストを生成
+				List<ArticleBean> list = new ArrayList<ArticleBean>();
+				ArticleBean bean = null;
+				while (rs.next()) {
+					bean = new ArticleBean();
+					bean.setId(rs.getInt("article_id"));
+					bean.setTitle(rs.getString("title"));
+					bean.setContent(rs.getString("content"));
+					bean.setCreatedAt(rs.getTimestamp("created_at"));
+					bean.setUserId(rs.getInt("user_id"));
+					list.add(bean);
+				}
+				// 投稿記事リストを返却
+				return list;
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+		
+	}
+	
+	/**
+	 * ログインユーザが投稿した記事の総数を取得する
+	 * @param userId ログインユーザのユーザID
+	 * @return 投稿記事の総数
+	 * @throws DAOException
+	 */
+	public int countAllByUserId(int userId) throws DAOException {
+		// 実行するSQLの設定
+		String sql = "SELECT count(*) FROM article WHERE user_id = ?";
+		try (// SQL実行オブジェクトを取得
+			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
+			// プレースホルダにパラメータをバインド
+			pstmt.setInt(1, userId);
+			try (// SQLの実行と結果セットの取得
+				 ResultSet rs = pstmt.executeQuery();) {
+				// 結果セットから件数を取得
+				int count = 0;
+				if (rs.next()) {
+					count = rs.getInt(1);
+				}
+				// 件数を返却
+				return count;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+	}
+	
+	/**
 	 * 記事番号から記事を取得する
 	 * @param id 取得する記事の記事番号
 	 * @return 記事がある場合は記事インスタンス、それ以外はnull
@@ -101,7 +172,7 @@ public class ArticleDAO extends BaseDAO {
 	 * @return 記事リスト
 	 * @throws DAOException
 	 */
-	public List<ArticleBean> findLikeKeywordAndUserId(SearchBean condition) throws DAOException {
+	public List<ArticleBean> findLikeKeywordAndUserId(CriteriaBean condition) throws DAOException {
 		// 実行するSQLの設定
 		String sql = "SELECT * FROM article WHERE (title LIKE ? OR content LIKE ?) AND user_id = ?";
 		try (//
@@ -138,12 +209,12 @@ public class ArticleDAO extends BaseDAO {
 	 * 指定されたキーワードがタイトルまたは記事内容に含まれている記事を取得する
 	 * @param keyword 検索キーワード
 	 * @param userId  ログインユーザのユーザID
-	 * @return
+	 * @return 記事リスト
 	 * @throws DAOException
 	 */
 	public List<ArticleBean> findLikeKeywordAndUserId(String keyword, int userId) throws DAOException {
 		try {
-			SearchBean conditions = new SearchBean(keyword, userId);
+			CriteriaBean conditions = new CriteriaBean(keyword, userId);
 			return this.findLikeKeywordAndUserId(conditions);
 		} catch (DAOException e) {
 			e.printStackTrace();
@@ -152,24 +223,42 @@ public class ArticleDAO extends BaseDAO {
 	}
 	
 	/**
-	 * 指定されたページの記事を取得する
-	 * @param limits  ページあたりの表示件数
-	 * @param page    表示するページ番号
+	 * 指定されたページの１ページ分のキーワードに合致した記事を取得する
+	 * @param keyword 検索キーワード
+	 * @param limits  ページ当たりの表示件数
+	 * @param page    表示ページ数
 	 * @param userId  ログインユーザのユーザID
 	 * @return 記事リスト
-	 * @throws DAOException 
+	 * @throws DAOException
 	 */
-	public List<ArticleBean> findByPaging(int limits, int page, int userId) throws DAOException {
-		// 実行するSQLの設定
-		String sql = "SELECT * FROM article WHERE user_id = ? ORDER BY article_id LIMIT ? OFFSET ?";
+	public List<ArticleBean> findLikeKeywordAndUserIdWithPagination(String keyword, int limits, int page, int userId) throws DAOException {
+		// 実行するSQLを設定
+		String sql = "SELECT * FROM article WHERE "; 
+		String pagination = "LIMIT ? OFFSET ?";
+		if (!(keyword == null || keyword.isEmpty())) {
+			// キーワードが入力されている場合
+			sql += "(title LIKE ? OR content LIKE ?) AND ";
+		}
+		sql += "user_id = ? " + pagination;
+		
 		try (// SQL実行オブジェクトを取得
 			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
-			// 表示するページの先頭レコードの位置を計算
+			// オフセット位置（表示開始レコードの位置）を計算
 			int offset = limits * (page - 1);
 			// プレースホルダにパラメータをバインド
-			pstmt.setInt(1, userId);
-			pstmt.setInt(2, limits);
-			pstmt.setInt(3, offset);
+			if (!(keyword == null || keyword.isEmpty())) {
+				// キーワードが入力されている場合
+				pstmt.setString(1, "%" + keyword + "%");
+				pstmt.setString(2, "%" + keyword + "%");
+				pstmt.setInt(3, userId);
+				pstmt.setInt(4, limits);
+				pstmt.setInt(5, offset);
+			} else {
+				// キーワードが入力されていない場合
+				pstmt.setInt(1, userId);
+				pstmt.setInt(2, limits);
+				pstmt.setInt(3, offset);
+			}
 			try (// SQLの実行と結果セットの取得
 				 ResultSet rs = pstmt.executeQuery();) {
 				// 結果セットから記事リストに変換
@@ -192,25 +281,55 @@ public class ArticleDAO extends BaseDAO {
 			e.printStackTrace();
 			throw new DAOException("レコードの取得に失敗しました。");
 		}
+		
+	}
+	/**
+	 * 検索条件に合致した記事を取得する
+	 * @param criteria 検索条件
+	 * @return 記事リスト
+	 * @throws DAOException
+	 */
+	public List<ArticleBean> findLikeKeywordAndUserIdWithPagination(CriteriaBean criteria) throws DAOException {
+		return this.findLikeKeywordAndUserIdWithPagination(criteria.getKeyword(), criteria.getLimits(), criteria.getPage(), criteria.getUserId());
 	}
 
-	public int countAllByUserId(int userId) throws DAOException {
+	/**
+	 * 指定されたページの記事を取得する
+	 * @param limits  ページあたりの表示件数
+	 * @param page    表示するページ番号
+	 * @param userId  ログインユーザのユーザID
+	 * @return 記事リスト
+	 * @throws DAOException 
+	 */
+	public List<ArticleBean> findByPaging(int limits, int page, int userId) throws DAOException {
 		// 実行するSQLの設定
-		String sql = "SELECT count(*) FROM article WHERE user_id = ?";
+		String sql = "SELECT * FROM article WHERE user_id = ? ORDER BY article_id LIMIT ? OFFSET ?";
 		try (// SQL実行オブジェクトを取得
 			 PreparedStatement pstmt = this.conn.prepareStatement(sql);) {
+			// 表示するページの先頭レコードの位置を計算
+			int offset = limits * (page -1);
 			// プレースホルダにパラメータをバインド
 			pstmt.setInt(1, userId);
+			pstmt.setInt(2, limits);
+			pstmt.setInt(3, offset);
 			try (// SQLの実行と結果セットの取得
 				 ResultSet rs = pstmt.executeQuery();) {
-				// 結果セットから件数を取得
-				int count = 0;
-				if (rs.next()) {
-					count = rs.getInt(1);
+				// 結果セットから記事リストに変換
+				List<ArticleBean> list = new ArrayList<ArticleBean>();
+				ArticleBean bean = null;
+				while (rs.next()) {
+					bean = new ArticleBean();
+					bean.setId(rs.getInt("article_id"));
+					bean.setTitle(rs.getString("title"));
+					bean.setContent(rs.getString("content"));
+					bean.setCreatedAt(rs.getTimestamp("created_at"));
+					bean.setUserId(rs.getInt("user_id"));
+					list.add(bean);
 				}
-				// 件数を返却
-				return count;
+				// 記事リストを返却
+				return list;
 			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DAOException("レコードの取得に失敗しました。");
@@ -293,6 +412,10 @@ public class ArticleDAO extends BaseDAO {
 			e.printStackTrace();
 			throw new DAOException("レコードの削除に失敗しました。");
 		}
+	}
+
+	public List<ArticleBean> findAllByUserId(CriteriaBean criteria) throws DAOException {
+		return this.findAllByUserIdWithPagination(criteria);
 	}
 
 }
