@@ -126,17 +126,18 @@ public class ArticleServlet extends BaseServlet {
 			}
 			
 			// 検索条件のインスタンス化
-			CriteriaBean condition = new CriteriaBean(keyword, bean.getId());
+			CriteriaBean condition = new CriteriaBean(keyword, bean.getId(), LIMIT_PER_PAGE, 1);
 			
 			try {
 				// 検索の実行
 				ArticleDAO dao = new ArticleDAO();
-				List<ArticleBean> list = dao.findLikeKeywordAndUserId(condition);
-			
-				
+				List<ArticleBean> list = dao.findLikeKeywordAndUserIdWithPagination(condition);
+				// 検索結果の総数を取得
+				int count = dao.countLikeKeywoordAndUserId(condition);
 				// リクエストに検索条件と記事リストを登録
 				request.setAttribute("condition", condition);
 				request.setAttribute("articleList", list);
+				request.setAttribute("totalpage", count);
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");
 				

@@ -1,11 +1,14 @@
 package diary.dao;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeAll;
 
 /**
@@ -46,5 +49,16 @@ class BaseDaoTest {
 		dbUnitConnection = new DatabaseConnection(jdbcConnection);
 	}
 	
-
+	/**
+	 * テスト用データを対象テーブルに設定する
+	 * @param targetXmlPath テスト用XMLデータファイルパス
+	 * @throws Exception
+	 */
+	void setRecord(String targetXmlPath) throws Exception {
+		// 復元用データセットの設定
+		dataset = new FlatXmlDataSetBuilder().build(new FileInputStream(targetXmlPath));
+		// データセットの復元
+		DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataset);
+	}
+	
 }

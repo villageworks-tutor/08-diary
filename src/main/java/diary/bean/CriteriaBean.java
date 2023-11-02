@@ -37,6 +37,7 @@ public class CriteriaBean implements Serializable {
 	 * @param userId ログインしているユーザのユーザ番号
 	 */
 	public CriteriaBean(int userId, int limits, int page) {
+		this.keyword = "";
 		this.userId  = userId;
 		this.limits  = limits;
 		this.page    = page;

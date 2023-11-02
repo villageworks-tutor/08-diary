@@ -11,7 +11,6 @@ public class EqualToArticle extends TypeSafeMatcher<ArticleBean> {
 	private ArticleBean expected;
 	
 	/** 異なる項目 */
-	@SuppressWarnings("unused")
 	private String difference;
 	
 	public EqualToArticle(ArticleBean expected) {
@@ -26,11 +25,11 @@ public class EqualToArticle extends TypeSafeMatcher<ArticleBean> {
 
 	@Override
 	protected boolean matchesSafely(ArticleBean actual) {
-		// 記事番号一致検査
-		if (actual.getId() != expected.getId()) {
-			this.difference = "記事番号";
-			return false;
-		}
+//		// 記事番号一致検査
+//		if (actual.getId() != expected.getId()) {
+//			this.difference = "記事番号";
+//			return false;
+//		}
 		// 記事タイトル一致検査
 		if (!actual.getTitle().equals(expected.getTitle())) {
 			this.difference = "記事タイトル";

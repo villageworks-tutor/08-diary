@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- articleテーブルのサンプル復元用レコード -->
 <dataset>
 	<article article_id="1" title="研修開始" content="これから技術を習得してエンジニアを目指します！" created_at="2022-04-01" user_id="1" />
 	<article article_id="2" title="IT 基礎" content="インターネットの仕組みとデータの流れを勉強しました" created_at="2022-04-02" user_id="1" />
