@@ -131,9 +131,9 @@ public class ArticleServlet extends BaseServlet {
 			try {
 				// 検索の実行
 				ArticleDAO dao = new ArticleDAO();
-				List<ArticleBean> list = dao.findLikeKeywordAndUserIdWithPagination(condition);
+				List<ArticleBean> list = dao.findByUserIdAndLikeKeywordWithPaging(condition);
 				// 検索結果の総数を取得
-				int count = dao.countLikeKeywoordAndUserId(condition);
+				int count = dao.countByUserIdAndLikeKeyword(condition);
 				// リクエストに検索条件と記事リストを登録
 				request.setAttribute("condition", condition);
 				request.setAttribute("articleList", list);
@@ -167,6 +167,7 @@ public class ArticleServlet extends BaseServlet {
 				// ページ単位の投稿記事を取得
 				ArticleDAO dao = new ArticleDAO();
 				List<ArticleBean> list = dao.findByPaging(LIMIT_PER_PAGE, page, userId);
+				list = dao.find
 				// リクエストスコープに登録
 				request.setAttribute("articleList", list);
 				request.setAttribute("totalPage", total);
