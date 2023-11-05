@@ -31,6 +31,8 @@ class SqlCreatorTest {
 	        = "SELECT * FROM article WHERE user_id = ? AND (title LIKE ? OR content LIKE ?) ORDER BY article_id LIMIT ? OFFSET ?";
 	private static final String SQL_COUNT_BY_USER_ID_AND_LIKE_KEYWORD 
 	        = "SELECT count(*) FROM article WHERE user_id = ? AND (title LIKE ? OR content LIKE ?)";
+	private static final String SQL_FIND_BY_USER_ID_WITH_PAGINATION = "SELECT * FROM article WHERE user_id = ? LIMIT ? OFFSET ?";
+	private static final String SQL_COUNT_ALL_FROM__ARTICLE_BY_USER_ID = "SELECT count(*) FROM article WHERE user_id = ?";
 	
 	@SuppressWarnings("unused")
 	private static final String SQL_INSERT_ARTICLE_WITH_PLACEHOLDER 
@@ -102,6 +104,19 @@ class SqlCreatorTest {
 			builder.append(SQL_DELETE_FROM_ARTICLE).append(CHAR_EMPTY);
 			builder.append(WHERE_USER_ID);
 			actual.add(builder.toString());
+			// [7] ユーザIDごとにページあたりに表示する件数分だけの記事を取得する
+			expected.add(SQL_FIND_BY_USER_ID_WITH_PAGINATION);
+			builder = new StringBuilder();
+			builder.append(SQL_FIND_FROM_ARTICLE).append(CHAR_EMPTY);
+			builder.append(WHERE_USER_ID).append(CHAR_EMPTY);
+			builder.append(LIMIT_OFFSET);
+			actual.add(builder.toString());
+			// [8] ユーザIDごとに記事の総件数を取得する
+			expected.add(SQL_COUNT_ALL_FROM__ARTICLE_BY_USER_ID);
+			builder = new StringBuilder();
+			builder.append(SQL_COUNT_FROM_ARTICLE).append(CHAR_EMPTY);
+			builder.append(WHERE_USER_ID);
+			actual.add(builder.toString());
 			
 			// パラメータの返却
 			return Stream.of(
@@ -111,6 +126,8 @@ class SqlCreatorTest {
 					, Arguments.of(actual.get(3), expected.get(3))
 					, Arguments.of(actual.get(4), expected.get(4))
 					, Arguments.of(actual.get(5), expected.get(5))
+					, Arguments.of(actual.get(6), expected.get(6))
+					, Arguments.of(actual.get(7), expected.get(7))
 					);
 		}
 	}

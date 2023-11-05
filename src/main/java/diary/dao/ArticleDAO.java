@@ -124,6 +124,36 @@ public class ArticleDAO extends BaseDAO {
 	}
 
 	/**
+	 * ユーザIDごとにページあたりに表示する件数分だけの記事を取得する
+	 * @param  criteria          検索条件
+	 * @return List<ArticleBean> 該当する記事の件数
+	 * @throws DAOException      DAO例外
+	 */
+	public List<ArticleBean> findByUserIdWithPagination(CriteriaBean criteria) throws DAOException {
+		// 表示レコード位置の計算
+		int offset = criteria.getLimits() * (criteria.getPage() - 1);
+		
+		try (// SQL実行オブジェクトを取得
+			 PreparedStatement pstmt = this.conn.prepareStatement(SQL_HELPER.FIND_BY_USER_ID_WITH_PAGINATION());) {
+			// プレースホルダにパラメータをバインディング
+			pstmt.setInt(1, criteria.getUserId());
+			pstmt.setInt(2, criteria.getLimits());
+			pstmt.setInt(3, offset);
+			try (// SQLの実行と結果セットの取得
+				 ResultSet rs = pstmt.executeQuery();) {
+				// 結果セットから記事リストに変換
+				List<ArticleBean> list = this.convertToBeans(rs);
+				// 記事リストを返却
+				return list;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+		
+	}
+
+	/**
 	 * ユーザIDのユーザが投稿した記事のうちしてされたキーワードを含む記事をページごとに表示する記事を取得する
 	 * @param  criteria          検索条件インスタンス：ここではユーザIDフィールドとキーワードフィールド以外は未設定
 	 * @return List<ArticleBean> 記事リスト
@@ -154,7 +184,7 @@ public class ArticleDAO extends BaseDAO {
 		}
 		
 	}
-
+	
 	/**
 	 * ユーザIDのユーザが投稿した記事のうちしてされたキーワードを含む記事の総件数を取得する
 	 * @param  criteria     検索条件インスタンス：ここではユーザIDフィールドとキーワードフィールド以外は未設定
@@ -184,7 +214,36 @@ public class ArticleDAO extends BaseDAO {
 		}
 		
 	}
-
+	
+	/**
+	 * ユーザIDごとに記事の総件数を取得する
+	 * @param  criteria     検索条件
+	 * @return int          該当する記事の件数
+	 * @throws DAOException DAO例外
+	 */
+	public int countAllByUserId(CriteriaBean criteria) throws DAOException {
+		
+		try (// SQL実行オブジェクトの取得
+			 PreparedStatement pstmt = this.conn.prepareStatement(SQL_HELPER.COUNT_FROM_ARTICLE_BY_USER_ID());) {
+			// プレースホルダにパラメータをバインド
+			pstmt.setInt(1, criteria.getUserId());
+			try (// SQLの実行と結果セットの取得
+				 ResultSet rs = pstmt.executeQuery();) {
+				// 結果セットから件数に変換
+				int  count = 0; // 明示的に負数で初期化
+				if (rs.next()) {
+					count = rs.getInt(1);
+				}
+				return count;
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DAOException("レコードの取得に失敗しました。");
+		}
+		
+	}
+	
 	/**
 	 * 投稿した記事を保存する
 	 * @param  article      処理対象記事
@@ -260,5 +319,5 @@ public class ArticleDAO extends BaseDAO {
 			throw new DAOException("レコードの削除に失敗しました。");
 		}
 	}
-	
+
 }

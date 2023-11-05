@@ -123,4 +123,27 @@ public class SQL_HELPER {
 		return builder.toString();
 	}
 	
+	/**
+	 * ユーザIDごとにページあたりに表示する件数分だけの記事を取得するSQLを返す
+	 * @return 	 * ユーザIDごとにページあたりに表示する件数分だけの記事を取得するSQL
+	 */
+	static String FIND_BY_USER_ID_WITH_PAGINATION() {
+		builder = new StringBuilder();
+		builder.append(SQL_FIND_FROM_ARTICLE).append(CHAR_EMPTY);
+		builder.append(WHERE_USER_ID).append(CHAR_EMPTY);
+		builder.append(LIMIT_OFFSET);
+		return builder.toString();
+	}
+
+	/**
+	 * ユーザIDごとに記事の総件数を取得するSQLを返す
+	 * @return ユーザIDごとに記事の総件数を取得するSQL
+	 */
+	static String COUNT_FROM_ARTICLE_BY_USER_ID() {
+		builder = new StringBuilder();
+		builder.append(SQL_COUNT_FROM_ARTICLE).append(CHAR_EMPTY);
+		builder.append(WHERE_USER_ID);
+		return builder.toString();
+	}
+	
 }

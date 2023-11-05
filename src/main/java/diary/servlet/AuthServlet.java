@@ -58,10 +58,11 @@ public class AuthServlet extends BaseServlet {
 				// List<ArticleBean> list = articleDao.findAllByUserId(profile.getId());
 				int firstPage = 1;
 				// List<ArticleBean> list = articleDao.findLikeKeywordWithPagination(criteria);
-				List<ArticleBean> list = articleDao.findAllByUserId(new CriteriaBean(profile.getId(), LIMIT_PER_PAGE, firstPage));
+				CriteriaBean criteria = new CriteriaBean(profile.getId(), LIMIT_PER_PAGE, firstPage);
+				List<ArticleBean> list = articleDao.findByUserIdWithPagination(criteria);
 				
 				// ログインユーザの投稿した記事の総数を取得
-				int count = articleDao.countAllByUserId(profile.getId());
+				int count = articleDao.countByUserIdAndLikeKeyword(criteria);
 				// 分割されたページ数を計算
 				int totalPage = count / LIMIT_PER_PAGE + 1;
 				// セッションにユーザ情報を登録
