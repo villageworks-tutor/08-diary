@@ -58,7 +58,11 @@
 			    </td>
 			</tr>
 		</c:forEach>
+		<caption style="text-align: left">
+			<jsp:include page="pagination.jsp" />
+		</caption>
 	</table>
+	<jsp:include page="pagination.jsp" />
 	<hr>
 	<form action="/diary/ArticleServlet" method="post">
 		タイトル：<input type="text" name="title"><br>

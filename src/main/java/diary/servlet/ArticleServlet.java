@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import diary.bean.ArticleBean;
+import diary.bean.CriteriaBean;
 import diary.bean.ProfileBean;
-import diary.bean.SearchBean;
 import diary.common.ConvertUtils;
 import diary.dao.ArticleDAO;
 import diary.dao.DAOException;
@@ -49,12 +49,24 @@ public class ArticleServlet extends BaseServlet {
 				// 記事に関する操作を担当するDAOをインスタンス化
 				ArticleDAO dao = new ArticleDAO();
 				// レコード操作を実行
-				dao.update(bean);
+				if (bean.getId() == 0) {
+					// 登録の場合：記事番号は未決定
+					dao.insert(bean);
+				} else {
+					// 更新の場合：記事番号は決定済
+					dao.update(bean);
+				}
 				
 				// 記事リストを取得
-				List<ArticleBean> list = dao.findAllByUserId(userId);
+				CriteriaBean criteria = new CriteriaBean(userId, LIMIT_PER_PAGE, 1);
+				List<ArticleBean> list = dao.findByUserIdWithPagination(criteria);
+				// 検索結果の総数を取得
+				int count = (dao.countByUserIdAndLikeKeyword(criteria) / criteria.getLimits()) + 1;
+				// 
 				// リクエストに記事リストを登録
+				request.setAttribute("condition", criteria);
 				request.setAttribute("articleList", list);
+				request.setAttribute("totalPage", count);
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");
 				
@@ -122,27 +134,68 @@ public class ArticleServlet extends BaseServlet {
 			ProfileBean bean = (ProfileBean) session.getAttribute("profile");
 			if (bean == null)  {
 				this.gotoErrPage(request, response, "不正な操作です。");
+				return;
 			}
 			
 			// 検索条件のインスタンス化
-			SearchBean condition = new SearchBean(keyword, bean.getId());
+			CriteriaBean criteria = new CriteriaBean(keyword, bean.getId(), LIMIT_PER_PAGE, 1);
 			
 			try {
 				// 検索の実行
 				ArticleDAO dao = new ArticleDAO();
-				List<ArticleBean> list = dao.findByKewordOrPeriod(condition);
-				
+				List<ArticleBean> list = dao.findByUserIdAndLikeKeywordWithPaging(criteria);
+				// 検索結果の総数を取得
+				int count = (dao.countByUserIdAndLikeKeyword(criteria) / criteria.getLimits()) + 1;
 				// リクエストに検索条件と記事リストを登録
-				request.setAttribute("condition", condition);
+				request.setAttribute("condition", criteria);
 				request.setAttribute("articleList", list);
+				request.setAttribute("totalPage", count);
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");
 				
-				
 			} catch (DAOException e) {
-				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 				this.gotoErrPage(request, response);
+			}
+		} else if (action.equals("pagination")) {
+			// セッションからユーザ情報を取得
+			HttpSession session = request.getSession(false);
+			if (session == null) {
+				this.gotoErrPage(request, response, "セッションがタイムアウトしています。トップページから操作してください。");
+				return;
+			}
+			ProfileBean profile = (ProfileBean) session.getAttribute("profile");
+			if (profile == null) {
+				this.gotoErrPage(request, response, "不正な操作です。");
+				return;
+			}
+			// ログインユーザのユーザIDを取得
+			int userId = profile.getId();
+			
+			try {
+				// リクエストパラメータを取得
+				int page = Integer.parseInt(request.getParameter("page"));
+				int total = Integer.parseInt(request.getParameter("total"));
+				// 検索条件のインスタンス化
+				CriteriaBean criteria = new CriteriaBean(userId, LIMIT_PER_PAGE, page);
+				// ページ単位の投稿記事を取得
+				ArticleDAO dao = new ArticleDAO();
+				List<ArticleBean> list = dao.findByUserIdWithPagination(criteria);
+				// リクエストスコープに登録
+				request.setAttribute("articleList", list);
+				request.setAttribute("totalPage", total);
+				
+				// 画面遷移
+				this.gotoPage(request, response, "success.jsp");
+				
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				this.gotoErrPage(request, response, "不正な操作です。");
+				return;
+			} catch (DAOException e) {
+				e.printStackTrace();
+				this.gotoErrPage(request, response);
+				return;
 			}
 		}
 	}

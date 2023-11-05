@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- articleテーブルのサンプル復元用レコード -->
+<dataset>
+	<article article_id="1" title="研修開始" content="これから技術を習得してエンジニアを目指します！" created_at="2022-04-01" user_id="1" />
+	<article article_id="2" title="IT 基礎" content="インターネットの仕組みとデータの流れを勉強しました" created_at="2022-04-02" user_id="1" />
+	<article article_id="3" title="プログラミング" content="条件分岐や繰り返し処理によって幅が広がってきました" created_at="2022-04-12" user_id="1" />
+	<article article_id="4" title="ペットの紹介" content="猫を 2 匹飼っています" created_at="2022-04-01" user_id="2" />
+	<article article_id="5" title="今日の天気" content="突然のにわか雨でした" created_at="2022-04-02" user_id="2" />
+</dataset>
