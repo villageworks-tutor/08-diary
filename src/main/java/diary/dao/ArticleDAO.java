@@ -230,7 +230,7 @@ public class ArticleDAO extends BaseDAO {
 			try (// SQLの実行と結果セットの取得
 				 ResultSet rs = pstmt.executeQuery();) {
 				// 結果セットから件数に変換
-				int  count = -1; // 明示的に負数で初期化
+				int  count = 0; // 明示的に負数で初期化
 				if (rs.next()) {
 					count = rs.getInt(1);
 				}

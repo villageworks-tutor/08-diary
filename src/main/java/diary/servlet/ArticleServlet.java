@@ -49,12 +49,24 @@ public class ArticleServlet extends BaseServlet {
 				// 記事に関する操作を担当するDAOをインスタンス化
 				ArticleDAO dao = new ArticleDAO();
 				// レコード操作を実行
-				dao.update(bean);
+				if (bean.getId() == 0) {
+					// 登録の場合：記事番号は未決定
+					dao.insert(bean);
+				} else {
+					// 更新の場合：記事番号は決定済
+					dao.update(bean);
+				}
 				
 				// 記事リストを取得
-				List<ArticleBean> list = dao.findAllByUserId(userId);
+				CriteriaBean criteria = new CriteriaBean(userId, LIMIT_PER_PAGE, 1);
+				List<ArticleBean> list = dao.findByUserIdWithPagination(criteria);
+				// 検索結果の総数を取得
+				int count = (dao.countByUserIdAndLikeKeyword(criteria) / criteria.getLimits()) + 1;
+				// 
 				// リクエストに記事リストを登録
+				request.setAttribute("condition", criteria);
 				request.setAttribute("articleList", list);
+				request.setAttribute("totalPage", count);
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");
 				
@@ -126,18 +138,18 @@ public class ArticleServlet extends BaseServlet {
 			}
 			
 			// 検索条件のインスタンス化
-			CriteriaBean condition = new CriteriaBean(keyword, bean.getId(), LIMIT_PER_PAGE, 1);
+			CriteriaBean criteria = new CriteriaBean(keyword, bean.getId(), LIMIT_PER_PAGE, 1);
 			
 			try {
 				// 検索の実行
 				ArticleDAO dao = new ArticleDAO();
-				List<ArticleBean> list = dao.findByUserIdAndLikeKeywordWithPaging(condition);
+				List<ArticleBean> list = dao.findByUserIdAndLikeKeywordWithPaging(criteria);
 				// 検索結果の総数を取得
-				int count = dao.countByUserIdAndLikeKeyword(condition);
+				int count = (dao.countByUserIdAndLikeKeyword(criteria) / criteria.getLimits()) + 1;
 				// リクエストに検索条件と記事リストを登録
-				request.setAttribute("condition", condition);
+				request.setAttribute("condition", criteria);
 				request.setAttribute("articleList", list);
-				request.setAttribute("totalpage", count);
+				request.setAttribute("totalPage", count);
 				// 画面遷移
 				this.gotoPage(request, response, "success.jsp");
 				
@@ -164,10 +176,11 @@ public class ArticleServlet extends BaseServlet {
 				// リクエストパラメータを取得
 				int page = Integer.parseInt(request.getParameter("page"));
 				int total = Integer.parseInt(request.getParameter("total"));
+				// 検索条件のインスタンス化
+				CriteriaBean criteria = new CriteriaBean(userId, LIMIT_PER_PAGE, page);
 				// ページ単位の投稿記事を取得
 				ArticleDAO dao = new ArticleDAO();
-				List<ArticleBean> list = dao.findByPaging(LIMIT_PER_PAGE, page, userId);
-				list = dao.find
+				List<ArticleBean> list = dao.findByUserIdWithPagination(criteria);
 				// リクエストスコープに登録
 				request.setAttribute("articleList", list);
 				request.setAttribute("totalPage", total);
